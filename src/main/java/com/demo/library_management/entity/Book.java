@@ -1,16 +1,14 @@
 package com.demo.library_management.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Entity
+
 @Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Entity
 @Table(name = "books")
 public class Book {
 
@@ -22,9 +20,17 @@ public class Book {
     private String title;
 
 
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id", nullable = false)
     private Author author;
 
+    public Book(String title) {
+        this.title = title;
+    }
+
+    void setAuthor(Author author) {
+        this.author = author;
+    }
 
 }
