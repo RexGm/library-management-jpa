@@ -1,13 +1,30 @@
 package com.demo.library_management.repository;
 
 import com.demo.library_management.entity.Book;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.*;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
 public interface BookRepository extends JpaRepository<Book, Long> {
 
-    List<Book> findByAuthor_Name(String name);
+    @Query("""
+        select b from Book b
+        join fetch b.author
+    """)
+    List<Book> findAllWithAuthor();
 
-    List<Book> findByTitleContainingIgnoreCase(String title);
+    @Query("""
+        select b from Book b
+        join fetch b.author
+        where lower(b.title) like lower(concat('%', :title, '%'))
+    """)
+    List<Book> findByTitleWithAuthor(@Param("title") String title);
+
+    @Query("""
+        select b from Book b
+        join fetch b.author
+        where b.author.name = :authorName
+    """)
+    List<Book> findByAuthorNameWithAuthor(@Param("authorName") String authorName);
 }

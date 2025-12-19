@@ -1,5 +1,6 @@
 package com.demo.library_management.controller;
 
+import com.demo.library_management.dto.AuthorResponse;
 import com.demo.library_management.entity.Author;
 import com.demo.library_management.service.AuthorService;
 import org.springframework.web.bind.annotation.*;
@@ -14,9 +15,18 @@ public class AuthorController {
         this.authorService = authorService;
     }
 
-    // for now its false usage ı wanna see LazyInitializationException
     @GetMapping("/{id}")
-    public Author getAuthor(@PathVariable Long id) {
-        return authorService.getAuthor(id);
+    public AuthorResponse getAuthor(@PathVariable Long id) {
+
+        Author author = authorService.getAuthorWithBooks(id);
+
+        return new AuthorResponse(
+                author.getId(),
+                author.getName(),
+                author.getBooks()
+                        .stream()
+                        .map(book -> book.getTitle())
+                        .toList()
+        );
     }
 }
