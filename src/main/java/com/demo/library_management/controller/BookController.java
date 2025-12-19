@@ -3,6 +3,10 @@ package com.demo.library_management.controller;
 import com.demo.library_management.dto.BookResponse;
 import com.demo.library_management.entity.Book;
 import com.demo.library_management.repository.BookRepository;
+import com.demo.library_management.service.BookService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,41 +15,26 @@ import java.util.List;
 @RequestMapping("/books")
 public class BookController {
 
-    private final BookRepository bookRepository;
+    private final BookService bookService;
 
-    public BookController(BookRepository bookRepository) {
-        this.bookRepository = bookRepository;
+    public BookController(BookService bookService) {
+        this.bookService = bookService;
     }
 
     @GetMapping
-    public List<BookResponse> getAllBooks() {
-        return bookRepository.findAllWithAuthor()
-                .stream()
-                .map(this::toResponse)
-                .toList();
+    public Page<BookResponse> getAllBooks(
+            @PageableDefault(size = 10, sort = "title") Pageable pageable
+    ) {
+        return bookService.getAllBooks(pageable);
     }
 
     @GetMapping("/search")
     public List<BookResponse> search(@RequestParam String title) {
-        return bookRepository.findByTitleWithAuthor(title)
-                .stream()
-                .map(this::toResponse)
-                .toList();
+        return bookService.searchByTitle(title);
     }
 
     @GetMapping("/by-author")
     public List<BookResponse> byAuthor(@RequestParam String authorName) {
-        return bookRepository.findByAuthorNameWithAuthor(authorName)
-                .stream()
-                .map(this::toResponse)
-                .toList();
-    }
-
-    private BookResponse toResponse(Book book) {
-        return new BookResponse(
-                book.getId(),
-                book.getTitle(),
-                book.getAuthor().getName()
-        );
+        return bookService.getByAuthorName(authorName);
     }
 }

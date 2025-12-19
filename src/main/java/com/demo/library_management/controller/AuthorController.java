@@ -1,6 +1,7 @@
 package com.demo.library_management.controller;
 
 import com.demo.library_management.dto.AuthorResponse;
+import com.demo.library_management.dto.CreateAuthorRequest;
 import com.demo.library_management.entity.Author;
 import com.demo.library_management.service.AuthorService;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,11 @@ public class AuthorController {
 
     public AuthorController(AuthorService authorService) {
         this.authorService = authorService;
+    }
+
+    @PostMapping
+    public void createAuthor(@RequestBody CreateAuthorRequest request) {
+        authorService.createAuthor(request.name());
     }
 
     @GetMapping("/{id}")

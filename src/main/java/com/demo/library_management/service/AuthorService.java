@@ -2,6 +2,7 @@ package com.demo.library_management.service;
 
 import com.demo.library_management.entity.Author;
 import com.demo.library_management.entity.Book;
+import com.demo.library_management.exception.NotFoundException;
 import com.demo.library_management.repository.AuthorRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,17 +19,22 @@ public class AuthorService {
     // single source of truth for reading
     public Author getAuthorWithBooks(Long id) {
         return authorRepository.findByIdWithBooks(id)
-                .orElseThrow(() -> new RuntimeException("Author not found"));
+                .orElseThrow(() -> new NotFoundException("Author not found with id: " + id));
     }
 
-    // write operation -> transactional
+    // write operation
     @Transactional
     public void addBookToAuthor(Long authorId, String title) {
         Author author = authorRepository.findById(authorId)
-                .orElseThrow(() -> new RuntimeException("Author not found"));
+                .orElseThrow(() -> new NotFoundException("Author not found with id: " + authorId));
 
         Book book = new Book(title);
         author.addBook(book);
-        // cascade handles persistence
     }
+
+    @Transactional
+    public void createAuthor(String name) {
+        authorRepository.save(new Author(name));
+    }
+
 }

@@ -1,6 +1,8 @@
 package com.demo.library_management.repository;
 
 import com.demo.library_management.entity.Book;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 
@@ -27,4 +29,17 @@ public interface BookRepository extends JpaRepository<Book, Long> {
         where b.author.name = :authorName
     """)
     List<Book> findByAuthorNameWithAuthor(@Param("authorName") String authorName);
+
+    @Query(
+            value = """
+        select b from Book b
+        join fetch b.author
+    """,
+            countQuery = """
+        select count(b) from Book b
+    """
+    )
+    Page<Book> findAllWithAuthor(Pageable pageable);
+
+
 }
